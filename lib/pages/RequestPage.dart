@@ -1,30 +1,16 @@
-// Prototype Test Code with “مراجعة الطلبات” in RequestPage Dropdown
 import 'package:flutter/material.dart';
 
-void main() => runApp(const TestApp());
+/// Combined page file for Request, Orders, and RequestReview pages.
+/// Place this file under `lib/pages/request_pages.dart` and register routes in main.dart.
 
-class TestApp extends StatelessWidget {
-  const TestApp({super.key});
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Prototype',
-      debugShowCheckedModeBanner: false,
-      initialRoute: '/request',
-      routes: {
-        '/request': (_) => const RequestPage(),
-        '/orders': (_) => const OrdersPage(),
-        '/review': (_) => const RequestReviewPage(),
-      },
-    );
-  }
-}
+enum UserRole { admin, manager, technician, assistant }
 
-/// 1) RequestPage
+// ------------------ 1) RequestPage ------------------
 class RequestPage extends StatefulWidget {
-  const RequestPage({super.key});
+  static const String routeName = '/request';
+  const RequestPage({Key? key}) : super(key: key);
   @override
-  State<RequestPage> createState() => _RequestPageState();
+  _RequestPageState createState() => _RequestPageState();
 }
 
 class _RequestPageState extends State<RequestPage> {
@@ -39,7 +25,7 @@ class _RequestPageState extends State<RequestPage> {
     'طلب دفع فاتورة',
     'إيداع كاش باليد',
     'إيداع بالحساب',
-    'مراجعة الطلبات', // ← الخيار الجديد
+    'مراجعة الطلبات',
   ];
 
   Future<void> _submit() async {
@@ -49,12 +35,10 @@ class _RequestPageState extends State<RequestPage> {
       );
       return;
     }
-    // Navigate immediately if "مراجعة الطلبات" selected
     if (_selectedType == 'مراجعة الطلبات') {
-      Navigator.pushNamed(context, '/review');
+      Navigator.pushNamed(context, RequestReviewPage.routeName);
       return;
     }
-    // Otherwise require a note
     if (_noteCtrl.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('يرجى كتابة الملاحظة')),
@@ -62,7 +46,7 @@ class _RequestPageState extends State<RequestPage> {
       return;
     }
     setState(() => _loading = true);
-    await Future.delayed(const Duration(seconds: 1)); // simulate API
+    await Future.delayed(const Duration(seconds: 1));
     setState(() => _loading = false);
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('تم إرسال الطلب بنجاح')),
@@ -78,7 +62,7 @@ class _RequestPageState extends State<RequestPage> {
         title: const Text('طلب'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pushNamed(context, '/orders'),
+            onPressed: () => Navigator.pushNamed(context, OrdersPage.routeName),
             child: const Text('الأوردرات', style: TextStyle(color: Colors.white)),
           ),
         ],
@@ -125,18 +109,20 @@ class _RequestPageState extends State<RequestPage> {
   }
 }
 
-/// 2) OrdersPage
+// ------------------ 2) OrdersPage ------------------
 class OrdersPage extends StatelessWidget {
-  const OrdersPage({super.key});
+  static const String routeName = '/orders';
+  const OrdersPage({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    final orders = List.generate(5, (i) => 'طلب رقم ${i + 1}');
+    final orders = List.generate(5, (i) => 'طلب رقم \${i + 1}');
     return Scaffold(
       appBar: AppBar(
         title: const Text('الأوردرات'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pushNamed(context, '/review'),
+            onPressed: () => Navigator.pushNamed(context, RequestReviewPage.routeName),
             child: const Text('مراجعة الطلبات', style: TextStyle(color: Colors.white)),
           ),
         ],
@@ -156,15 +142,16 @@ class OrdersPage extends StatelessWidget {
   }
 }
 
-/// 3) RequestReviewPage
+// ------------------ 3) RequestReviewPage ------------------
 class RequestReviewPage extends StatefulWidget {
-  const RequestReviewPage({super.key});
+  static const String routeName = '/review';
+  const RequestReviewPage({Key? key}) : super(key: key);
   @override
-  State<RequestReviewPage> createState() => _RequestReviewPageState();
+  _RequestReviewPageState createState() => _RequestReviewPageState();
 }
 
 class _RequestReviewPageState extends State<RequestReviewPage> {
-  final List<String> _months = const [
+  final List<String> _months = [
     'كل الشهور',
     'يناير','فبراير','مارس','أبريل','مايو','يونيو',
     'يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'
@@ -173,10 +160,9 @@ class _RequestReviewPageState extends State<RequestReviewPage> {
 
   @override
   Widget build(BuildContext context) {
-    // sample filtered requests
     final requests = List.generate(
       10,
-      (i) => 'طلب ${i + 1} لشهر $_selectedMonth',
+      (i) => 'طلب \${i + 1} لشهر \$_selectedMonth',
     );
     return Scaffold(
       appBar: AppBar(title: const Text('مراجعة الطلبات')),

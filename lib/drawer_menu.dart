@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../pages/login_page.dart';
 import '../pages/home_page.dart';
-import '../pages/project_invoice_page.dart';
 import '../pages/upload_invoice_page.dart';
+import '../pages/project_invoice_page.dart';
 import '../pages/tools_reports_page.dart';
 import '../pages/user_management_page.dart';
 import '../pages/money_requests_review_page.dart';
@@ -12,7 +12,6 @@ import '../pages/schedule_tomorrow_page.dart';
 import '../pages/maintenance_requests_review_page.dart';
 import '../pages/settings_page.dart';
 
-/// قائمة التنقل الجانبي (Drawer) مع صلاحيات عرض العناصر حسب الدور
 class DrawerMenu extends StatelessWidget {
   final String username;
   final UserRole role;
@@ -30,7 +29,7 @@ class DrawerMenu extends StatelessWidget {
             accountName: Text(username),
             accountEmail: Text(role.name),
           ),
-          // الرئيسية (all)
+          // الرئيسية
           _buildTile(
             context,
             label: 'الرئيسية',
@@ -46,13 +45,13 @@ class DrawerMenu extends StatelessWidget {
             route: ProjectInvoicePage.route,
             visible: role == UserRole.admin,
           ),
-          // تحميل فواتير (manager, technician, assistant)
+          // تحميل فواتير (maintenanceManager, technician, assistant)
           _buildTile(
             context,
             label: 'تحميل فواتير',
             icon: Icons.receipt,
-            route: UploadInvoicePage.routeName,
-            visible: role == UserRole.manager || role == UserRole.technician || role == UserRole.assistant,
+            route: UploadInvoicePage.route,
+            visible: role == UserRole.technician || role == UserRole.assistant,
           ),
           // تقارير العدة والأدوات (admin)
           _buildTile(
@@ -67,7 +66,7 @@ class DrawerMenu extends StatelessWidget {
             context,
             label: 'إدارة المستخدمين',
             icon: Icons.people,
-            route: UserManagementPage.routeName,
+            route: UserManagementPage.route,
             visible: role == UserRole.admin,
           ),
           // مراجعة طلبات الأموال (admin)
@@ -86,21 +85,21 @@ class DrawerMenu extends StatelessWidget {
             route: ExportReportsPage.route,
             visible: role == UserRole.admin,
           ),
-          // العدة والأدوات (admin, manager)
+          // العدة والأدوات (admin, maintenanceManager)
           _buildTile(
             context,
             label: 'العدة والأدوات',
             icon: Icons.build,
             route: EquipmentSetupPage.route,
-            visible: role == UserRole.admin || role == UserRole.manager,
+            visible: role == UserRole.admin,
           ),
-          // تحديد موعد الدوام غداً (admin, manager)
+          // تحديد موعد الدوام غداً (admin, maintenanceManager)
           _buildTile(
             context,
             label: 'تحديد موعد الدوام غداً',
             icon: Icons.calendar_today,
             route: ScheduleTomorrowPage.route,
-            visible: role == UserRole.admin || role == UserRole.manager,
+            visible: role == UserRole.admin,
           ),
           // مراجعة طلبات الصيانة (admin)
           _buildTile(
@@ -124,7 +123,6 @@ class DrawerMenu extends StatelessWidget {
             leading: const Icon(Icons.logout),
             title: const Text('تسجيل الخروج'),
             onTap: () {
-              Navigator.pop(context);
               Navigator.pushReplacementNamed(context, LoginPage.route);
             },
           ),

@@ -1,79 +1,116 @@
 import 'package:flutter/material.dart';
 
+/// Ready-to-use Maintenance Requests Review page.
+/// Place this file under `lib/pages/maintenance_requests_review_page.dart` and register its route in main.dart.
+
+enum UserRole { admin, maintenanceManager, technician, assistant }
+
 class MaintenanceRequestsReviewPage extends StatefulWidget {
-  static const route = '/maintenance-requests';
-  const MaintenanceRequestsReviewPage({super.key});
+  static const String routeName = '/maintenance_requests_review';
+
+  /// User role (for potential access control)
+  final UserRole role;
+
+  const MaintenanceRequestsReviewPage({
+    Key? key,
+    required this.role,
+  }) : super(key: key);
+
   @override
-  State<MaintenanceRequestsReviewPage> createState() => _MaintenanceRequestsReviewPageState();
+  _MaintenanceRequestsReviewPageState createState() => _MaintenanceRequestsReviewPageState();
 }
 
 class _MaintenanceRequestsReviewPageState extends State<MaintenanceRequestsReviewPage> {
-  final _months = List.generate(12, (i) => i + 1);
-  int? _selectedMonth;
-  final List<Map<String,String>> _reqs = [
-    {
-      'id': '1/2025',
-      'customer': 'Ali',
-      'phone': '0501234567',
-      'villa': '12',
-      'tech': 'tech1',
-      'loc': 'https://maps.google.com',
-      'when': '2025-06-20 09:00'
-    },
+  String selectedMonth = '0 - All Months (كل الأشهر)';
+  String selectedStatus = 'All (الكل)';
+  String selectedTech = 'All (الكل)';
+
+  final List<String> months = [
+    '0 - All Months (كل الأشهر)',
+    '1 - Jan (يناير)',
+    '2 - Feb (فبراير)',
+    '3 - Mar (مارس)',
+    '4 - Apr (أبريل)',
+    '5 - May (مايو)',
+    '6 - Jun (يونيو)',
+    '7 - Jul (يوليو)',
+    '8 - Aug (أغسطس)',
+    '9 - Sep (سبتمبر)',
+    '10 - Oct (أكتوبر)',
+    '11 - Nov (نوفمبر)',
+    '12 - Dec (ديسمبر)',
+  ];
+
+  final List<String> statuses = [
+    'All (الكل)',
+    'Pending (بانتظار)',
+    'Approved (موافق عليه)',
+    'Rejected (مرفوض)',
+  ];
+
+  final List<String> technicians = [
+    'All (الكل)',
+    'Ali (علي)',
+    'Mohammad (محمد)',
+    'Kashif (كاشف)',
   ];
 
   @override
-  Widget build(BuildContext ctx) {
+  Widget build(BuildContext context) {
+    // Optional: enforce access control based on role
+    final canAccess = widget.role == UserRole.admin ||
+        widget.role == UserRole.maintenanceManager;
+    if (!canAccess) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Review Requests (مراجعة الطلبات)')),
+        body: const Center(child: Text('Access Denied (غير مصرح)')),
+      );
+    }
+
     return Scaffold(
-      appBar: AppBar(title: const Text('مراجعة طلبات الصيانة')),
+      appBar: AppBar(title: const Text('Review Requests (مراجعة الطلبات)')),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(children: [
-          DropdownButton<int>(
-            hint: const Text('شهر'),
-            value: _selectedMonth,
-            items: _months.map((m) => DropdownMenuItem(value: m, child: Text('$m'))).toList(),
-            onChanged: (v) => setState(() => _selectedMonth = v),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: [
+              DropdownButton<String>(
+                value: selectedMonth,
+                items: months
+                    .map((m) => DropdownMenuItem(value: m, child: Text(m)))
+                    .toList(),
+                onChanged: (v) => setState(() => selectedMonth = v!),
+                hint: const Text('Month (الشهر)'),
+              ),
+              const SizedBox(width: 12),
+              DropdownButton<String>(
+                value: selectedStatus,
+                items: statuses
+                    .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                    .toList(),
+                onChanged: (v) => setState(() => selectedStatus = v!),
+                hint: const Text('Status (الحالة)'),
+              ),
+              const SizedBox(width: 12),
+              DropdownButton<String>(
+                value: selectedTech,
+                items: technicians
+                    .map((t) => DropdownMenuItem(value: t, child: Text(t)))
+                    .toList(),
+                onChanged: (v) => setState(() => selectedTech = v!),
+                hint: const Text('Technician (الفني)'),
+              ),
+              const SizedBox(width: 20),
+              ElevatedButton(
+                onPressed: () {
+                  // TODO: apply filtering logic here
+                },
+                child: const Text('Apply (تطبيق)'),
+              ),
+            ],
           ),
-          const SizedBox(height: 12),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _reqs.length,
-              itemBuilder: (_, i) {
-                final r = _reqs[i];
-                return Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text('رقم: ${r['id']}'),
-                      Text('زبون: ${r['customer']} (${r['phone']})'),
-                      if ((r['villa'] ?? '').isNotEmpty) Text('فيلا: ${r['villa']}'),
-                      Text('فني: ${r['tech']}'),
-                      TextButton(
-                        onPressed: () {}, 
-                        child: const Text('عرض الموقع')
-                      ),
-                      Text('موعد: ${r['when']}'),
-                      Row(children: [
-                        ElevatedButton(onPressed: () {
-                          ScaffoldMessenger.of(ctx).showSnackBar(
-                            SnackBar(content: Text('قبول الطلب ${r['id']}'))
-                          );
-                        }, child: const Text('Accept')),
-                        const SizedBox(width: 8),
-                        ElevatedButton(onPressed: () {
-                          ScaffoldMessenger.of(ctx).showSnackBar(
-                            SnackBar(content: Text('رفض الطلب ${r['id']}'))
-                          );
-                        }, child: const Text('Reject')),
-                      ]),
-                    ]),
-                  ),
-                );
-              },
-            ),
-          ),
-        ]),
+        ),
       ),
     );
   }

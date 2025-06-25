@@ -1,96 +1,81 @@
+// lib/pages/home_page.dart
+
+import 'package:flutter/material.dart';
+import 'login_page.dart';                   // للتعريف بما فيّ UserRole
+import '../widgets/drawer_menu.dart';
+import 'request_page.dart';
+import 'maintenance_requests_review_page.dart';
+import 'attendance_page.dart';
+
 class HomePage extends StatefulWidget {
+  static const route = '/home';
   final String username;
-  const HomePage({Key? key, required this.username}) : super(key: key);
+  final UserRole role;
+  const HomePage({
+    Key? key,
+    required this.username,
+    required this.role,
+  }) : super(key: key);
+
   @override
-  _HomePageState createState() => _HomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  int _selectedIndex = 0;
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  void _onNavTap(int index) {
-    // فقط لطباعة الوجهة في DartPad
-    final names = ['الإشعارات', 'طلب', 'الأوردرات', 'الدوام', 'المزيد'];
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('انتقلت إلى: ${names[index]}')),
-    );
+  // أربع صفحات حقيقيّة + خامس عنصر للـ “المزيد”
+  static const List<Widget> _pages = [
+    Center(child: Text('الإشعارات')),
+    RequestPage(),                      // 1: تقديم طلب
+    MaintenanceRequestsReviewPage(),    // 2: طلبات الصيانة
+    AttendancePage(),                   // 3: تسجيل الدوام
+    SizedBox.shrink(),                  // 4: للمزيد (يفتح الـ drawer)
+  ];
+
+  void _onItemTapped(int index) {
     if (index == 4) {
       _scaffoldKey.currentState?.openDrawer();
+    } else {
+      setState(() => _selectedIndex = index);
     }
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext ctx) {
     return Scaffold(
       key: _scaffoldKey,
-      drawer: _buildDrawer(),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // رأس الصفحة: الصورة واسم المستخدم
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('اختر صورة المستخدم')),
-                      );
-                    },
-                    child: const CircleAvatar(
-                      radius: 20,
-                      backgroundColor: Colors.grey,
-                      child: Icon(Icons.person, color: Colors.white),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    widget.username,
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-            ),
-            // وسط الصفحة: الشعار
-            const Expanded(
-              child: Center(
-                child: FlutterLogo(size: 120),
-              ),
-            ),
-            // شريط الأزرار السفلي
-            Container(
-              color: Colors.white,
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _NavButton(
-                      icon: Icons.notifications,
-                      label: 'الإشعارات',
-                      onTap: () => _onNavTap(0)),
-                  _NavButton(
-                      icon: Icons.send,
-                      label: 'طلب',
-                      onTap: () => _onNavTap(1)),
-                  _NavButton(
-                      icon: Icons.list_alt,
-                      label: 'الأوردرات',
-                      onTap: () => _onNavTap(2)),
-                  _NavButton(
-                      icon: Icons.access_time,
-                      label: 'الدوام',
-                      onTap: () => _onNavTap(3)),
-                  _NavButton(
-                      icon: Icons.menu,
-                      label: 'المزيد',
-                      onTap: () => _onNavTap(4)),
-                ],
-              ),
-            ),
-          ],
-        ),
+      appBar: AppBar(title: Text('مرحباً ${widget.username}')),
+      drawer: DrawerMenu(username: widget.username, role: widget.role),
+      body: _pages[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.notifications),
+            label: 'الإشعارات',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.request_page),
+            label: 'الطلبات',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.build_circle),
+            label: 'طلبات الصيانة',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.access_time),
+            label: 'الدوام',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.menu),
+            label: 'المزيد',
+          ),
+        ],
       ),
     );
   }
+}
