@@ -1,14 +1,16 @@
-import 'package:flutter/material.dart';
-import 'home_page.dart';
+// lib/pages/login_page.dart
 
-enum UserRole { admin, maintenanceManager, technician, assistant }
+import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
   static const route = '/';
   const LoginPage({super.key});
+
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
+
+enum UserRole { admin, maintenanceManager, technician, assistant }
 
 class _LoginPageState extends State<LoginPage> {
   final _userCtrl = TextEditingController();
@@ -30,7 +32,7 @@ class _LoginPageState extends State<LoginPage> {
       final role = _users[u]!['role'] as UserRole;
       Navigator.pushReplacementNamed(
         context,
-        HomePage.route,
+        '/home',  // استخدام المسار الحرفي
         arguments: {'username': u, 'role': role},
       );
     } else {
