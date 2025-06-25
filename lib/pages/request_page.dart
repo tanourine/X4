@@ -1,72 +1,221 @@
-// lib/pages/request_page.dart
-
+// Prototype Test Code with “مراجعة الطلبات” in RequestPage Dropdown
 import 'package:flutter/material.dart';
 
-class RequestPage extends StatefulWidget {
-  static const route = '/request';
-  const RequestPage({super.key});
+void main() => runApp(const TestApp());
 
+class TestApp extends StatelessWidget {
+  const TestApp({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Prototype',
+      debugShowCheckedModeBanner: false,
+      initialRoute: '/request',
+      routes: {
+        '/request': (_) => const RequestPage(),
+        '/orders': (_) => const OrdersPage(),
+        '/review': (_) => const RequestReviewPage(),
+      },
+    );
+  }
+}
+
+/// 1) RequestPage
+class RequestPage extends StatefulWidget {
+  const RequestPage({super.key});
   @override
   State<RequestPage> createState() => _RequestPageState();
 }
 
 class _RequestPageState extends State<RequestPage> {
-  final _types = ['Cash In Hand', 'Bank Transfer'];
+  final _noteCtrl = TextEditingController();
   String? _selectedType;
-  final _amountCtrl = TextEditingController();
-  final _notesCtrl = TextEditingController();
+  bool _loading = false;
 
-  void _submit() {
-    if (_selectedType == null ||
-        _amountCtrl.text.trim().isEmpty ||
-        _notesCtrl.text.trim().isEmpty) return;
+  final List<String> _types = [
+    'طلب أموال كاش',
+    'طلب سحب من بطاقة البنك',
+    'طلب تحويل أموال إلى بطاقة بنك',
+    'طلب دفع فاتورة',
+    'إيداع كاش باليد',
+    'إيداع بالحساب',
+    'مراجعة الطلبات', // ← الخيار الجديد
+  ];
+
+  Future<void> _submit() async {
+    if (_selectedType == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('يرجى اختيار نوع الطلب')),
+      );
+      return;
+    }
+    // Navigate immediately if "مراجعة الطلبات" selected
+    if (_selectedType == 'مراجعة الطلبات') {
+      Navigator.pushNamed(context, '/review');
+      return;
+    }
+    // Otherwise require a note
+    if (_noteCtrl.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('يرجى كتابة الملاحظة')),
+      );
+      return;
+    }
+    setState(() => _loading = true);
+    await Future.delayed(const Duration(seconds: 1)); // simulate API
+    setState(() => _loading = false);
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('تم تقديم طلب ($_selectedType)')),
+      const SnackBar(content: Text('تم إرسال الطلب بنجاح')),
     );
-    setState(() {
-      _selectedType = null;
-      _amountCtrl.clear();
-      _notesCtrl.clear();
-    });
+    _noteCtrl.clear();
+    setState(() => _selectedType = null);
   }
 
   @override
-  void dispose() {
-    _amountCtrl.dispose();
-    _notesCtrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext ctx) {
+  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('طلب')),
+      appBar: AppBar(
+        title: const Text('طلب'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pushNamed(context, '/orders'),
+            child: const Text('الأوردرات', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(children: [
-          DropdownButtonFormField<String>(
-            decoration: const InputDecoration(labelText: 'نوع الطلب'),
-            value: _selectedType,
-            items: _types
-                .map((t) => DropdownMenuItem(value: t, child: Text(t)))
-                .toList(),
-            onChanged: (v) => setState(() => _selectedType = v),
+        child: Column(
+          children: [
+            DropdownButtonFormField<String>(
+              value: _selectedType,
+              decoration: const InputDecoration(
+                labelText: 'نوع الطلب',
+                border: OutlineInputBorder(),
+              ),
+              items: _types
+                  .map((t) => DropdownMenuItem(value: t, child: Text(t)))
+                  .toList(),
+              onChanged: (v) => setState(() => _selectedType = v),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _noteCtrl,
+              decoration: const InputDecoration(
+                labelText: 'الملاحظة *',
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 3,
+            ),
+            const Spacer(),
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: ElevatedButton(
+                onPressed: _loading ? null : _submit,
+                child: _loading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text('إرسال الطلب'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// 2) OrdersPage
+class OrdersPage extends StatelessWidget {
+  const OrdersPage({super.key});
+  @override
+  Widget build(BuildContext context) {
+    final orders = List.generate(5, (i) => 'طلب رقم ${i + 1}');
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('الأوردرات'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pushNamed(context, '/review'),
+            child: const Text('مراجعة الطلبات', style: TextStyle(color: Colors.white)),
           ),
-          const SizedBox(height: 8),
-          TextField(
-            controller: _amountCtrl,
-            keyboardType: TextInputType.number,
-            decoration: const InputDecoration(labelText: 'المبلغ *'),
+        ],
+      ),
+      body: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: orders.length,
+        itemBuilder: (_, i) => Card(
+          margin: const EdgeInsets.symmetric(vertical: 8),
+          child: ListTile(
+            title: Text(orders[i]),
+            subtitle: const Text('تفاصيل الطلب'),
           ),
-          const SizedBox(height: 8),
-          TextField(
-            controller: _notesCtrl,
-            maxLines: 3,
-            decoration: const InputDecoration(labelText: 'ملاحظة *'),
+        ),
+      ),
+    );
+  }
+}
+
+/// 3) RequestReviewPage
+class RequestReviewPage extends StatefulWidget {
+  const RequestReviewPage({super.key});
+  @override
+  State<RequestReviewPage> createState() => _RequestReviewPageState();
+}
+
+class _RequestReviewPageState extends State<RequestReviewPage> {
+  final List<String> _months = const [
+    'كل الشهور',
+    'يناير','فبراير','مارس','أبريل','مايو','يونيو',
+    'يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'
+  ];
+  String? _selectedMonth = 'كل الشهور';
+
+  @override
+  Widget build(BuildContext context) {
+    // sample filtered requests
+    final requests = List.generate(
+      10,
+      (i) => 'طلب ${i + 1} لشهر $_selectedMonth',
+    );
+    return Scaffold(
+      appBar: AppBar(title: const Text('مراجعة الطلبات')),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: DropdownButtonFormField<String>(
+              value: _selectedMonth,
+              decoration: const InputDecoration(
+                labelText: 'فلترة بالشهر',
+                border: OutlineInputBorder(),
+              ),
+              items: _months
+                  .map((m) => DropdownMenuItem(value: m, child: Text(m)))
+                  .toList(),
+              onChanged: (v) => setState(() => _selectedMonth = v),
+            ),
           ),
-          const SizedBox(height: 16),
-          ElevatedButton(onPressed: _submit, child: const Text('إرسال')),
-        ]),
+          Expanded(
+            child: ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: requests.length,
+              itemBuilder: (_, i) => Card(
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                child: ListTile(
+                  title: Text(requests[i]),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(icon: const Icon(Icons.check), onPressed: () {}),
+                      IconButton(icon: const Icon(Icons.close), onPressed: () {}),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
