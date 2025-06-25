@@ -1,44 +1,44 @@
 import 'package:flutter/material.dart';
 
-class UploadInvoicePage extends StatefulWidget {
-  static const route = '/upload-invoice';
-  const UploadInvoicePage({super.key});
+class ProjectInvoicePage extends StatefulWidget {
+  static const route = '/project-invoice';
+  const ProjectInvoicePage({super.key});
   @override
-  State<UploadInvoicePage> createState() => _UploadInvoicePageState();
+  State<ProjectInvoicePage> createState() => _ProjectInvoicePageState();
 }
 
-class _UploadInvoicePageState extends State<UploadInvoicePage> {
-  final _types = ['Maintenance', 'Fuel', 'Other'];
-  String? _selectedType;
+class _ProjectInvoicePageState extends State<ProjectInvoicePage> {
+  final _projects = ['Project A', 'Project B'];
+  String? _sel;
   final _notesCtrl = TextEditingController();
   bool _hasImage = false, _submitting = false;
   final _today = DateTime.now().toLocal().toString().split(' ')[0];
   final _uploads = <Map<String, String>>[];
 
   Future<void> _attachImage() async {
-    final choice = await showModalBottomSheet<String>(
+    final c = await showModalBottomSheet<String>(
       context: context,
-      builder: (c) => Column(mainAxisSize: MainAxisSize.min, children: [
-        ListTile(leading: const Icon(Icons.camera_alt), title: const Text('كاميرا'), onTap: () => Navigator.pop(c, 'cam')),
-        ListTile(leading: const Icon(Icons.photo),       title: const Text('معرض'), onTap: () => Navigator.pop(c, 'gal')),
+      builder: (ctx) => Column(mainAxisSize: MainAxisSize.min, children: [
+        ListTile(leading: const Icon(Icons.camera_alt), title: const Text('كاميرا'), onTap: () => Navigator.pop(ctx, 'cam')),
+        ListTile(leading: const Icon(Icons.photo),       title: const Text('معرض'), onTap: () => Navigator.pop(ctx, 'gal')),
       ]),
     );
-    if (choice != null) setState(() => _hasImage = true);
+    if (c != null) setState(() => _hasImage = true);
   }
 
   Future<void> _submit() async {
-    if (_selectedType == null || !_hasImage || _notesCtrl.text.trim().isEmpty) return;
+    if (_sel == null || !_hasImage || _notesCtrl.text.trim().isEmpty) return;
     setState(() => _submitting = true);
     await Future.delayed(const Duration(seconds: 1));
-    // ... إرسال إلى قناة Telegram النوعية
+    // إرسال إلى project_invoices_channel
     setState(() {
-      _uploads.insert(0, {'type': _selectedType!, 'date': _today, 'notes': _notesCtrl.text.trim()});
+      _uploads.insert(0, {'project': _sel!, 'date': _today, 'notes': _notesCtrl.text.trim()});
       _submitting = false;
-      _selectedType = null;
+      _sel = null;
       _notesCtrl.clear();
       _hasImage = false;
     });
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم رفع الفاتورة')));
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('تم رفع فاتورة المشروع')));
   }
 
   @override
@@ -50,15 +50,15 @@ class _UploadInvoicePageState extends State<UploadInvoicePage> {
   @override
   Widget build(BuildContext c) {
     return Scaffold(
-      appBar: AppBar(title: const Text('تحميل فواتير')),
+      appBar: AppBar(title: const Text('تحميل فواتير المشاريع')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: ListView(children: [
           DropdownButtonFormField<String>(
-            decoration: const InputDecoration(labelText: 'نوع الفاتورة'),
-            value: _selectedType,
-            items: _types.map((t) => DropdownMenuItem(value: t, child: Text(t))).toList(),
-            onChanged: (v) => setState(() => _selectedType = v),
+            decoration: const InputDecoration(labelText: 'المشروع'),
+            value: _sel,
+            items: _projects.map((p) => DropdownMenuItem(value: p, child: Text(p))).toList(),
+            onChanged: (v) => setState(() => _sel = v),
           ),
           const SizedBox(height: 12),
           TextField(
@@ -87,7 +87,7 @@ class _UploadInvoicePageState extends State<UploadInvoicePage> {
             const Text('التحميلات اليوم:', style: TextStyle(fontWeight: FontWeight.bold)),
             ..._uploads.map((u) => Card(
                   child: ListTile(
-                    title: Text(u['type']!),
+                    title: Text(u['project']!),
                     subtitle: Text('${u['date']} – ${u['notes']}'),
                   ),
                 )),

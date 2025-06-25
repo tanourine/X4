@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'home_page.dart';
 
 enum UserRole { admin, maintenanceManager, technician, assistant }
 
 class LoginPage extends StatefulWidget {
-  static const routeName = '/';
+  static const route = '/';
   const LoginPage({super.key});
-
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
@@ -15,13 +15,12 @@ class _LoginPageState extends State<LoginPage> {
   final _passCtrl = TextEditingController();
   String? _error;
 
-  // المستخدمون الثابتون
   final _users = {
-    'eng ali': {'pass': '4229', 'role': UserRole.admin},
-    'supervisor1': {'pass': '1234', 'role': UserRole.maintenanceManager},
-    'tech1': {'pass': 'abcd', 'role': UserRole.technician},
-    'tech2': {'pass': 'efgh', 'role': UserRole.technician},
-    'assistant1': {'pass': 'zzz1', 'role': UserRole.assistant},
+    'eng ali':    {'pass': '4229', 'role': UserRole.admin},
+    'supervisor': {'pass': '1234', 'role': UserRole.maintenanceManager},
+    'tech1':      {'pass': 'abcd', 'role': UserRole.technician},
+    'tech2':      {'pass': 'efgh', 'role': UserRole.technician},
+    'assistant1': {'pass': 'zzz1','role': UserRole.assistant},
   };
 
   void _login() {
@@ -31,11 +30,11 @@ class _LoginPageState extends State<LoginPage> {
       final role = _users[u]!['role'] as UserRole;
       Navigator.pushReplacementNamed(
         context,
-        '/home',
+        HomePage.route,
         arguments: {'username': u, 'role': role},
       );
     } else {
-      setState(() => _error = 'Invalid credentials (بيانات خاطئة)');
+      setState(() => _error = 'بيانات خاطئة');
     }
   }
 
@@ -47,37 +46,35 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext ctx) {
     return Scaffold(
       appBar: AppBar(title: const Text('Login')),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            TextField(
-              controller: _userCtrl,
-              decoration: const InputDecoration(labelText: 'Username'),
-            ),
+        child: Column(children: [
+          TextField(
+            controller: _userCtrl,
+            decoration: const InputDecoration(labelText: 'Username'),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _passCtrl,
+            decoration: const InputDecoration(labelText: 'Password'),
+            obscureText: true,
+          ),
+          const SizedBox(height: 16),
+          if (_error != null) ...[
+            Text(_error!, style: const TextStyle(color: Colors.red)),
             const SizedBox(height: 8),
-            TextField(
-              controller: _passCtrl,
-              decoration: const InputDecoration(labelText: 'Password'),
-              obscureText: true,
-            ),
-            const SizedBox(height: 16),
-            if (_error != null) ...[
-              Text(_error!, style: const TextStyle(color: Colors.red)),
-              const SizedBox(height: 8),
-            ],
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _login,
-                child: const Text('Login (تسجيل الدخول)'),
-              ),
-            ),
           ],
-        ),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: _login,
+              child: const Text('Login'),
+            ),
+          ),
+        ]),
       ),
     );
   }
