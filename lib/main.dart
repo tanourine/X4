@@ -17,16 +17,16 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Tanourine App',
       debugShowCheckedModeBanner: false,
-      initialRoute: LoginPage.routeName,
+      initialRoute: '/',
       routes: {
-        LoginPage.routeName: (_) => const LoginPage(),
-        HomePage.routeName: (_) => const HomePage(),
-        UploadInvoicePage.routeName: (_) => const UploadInvoicePage(),
-        EquipmentCheckPage.routeName: (_) => const EquipmentCheckPage(),
-        ToolsReportsPage.routeName: (_) => const ToolsReportsPage(),
-        ScheduleTomorrowPage.routeName: (_) => const ScheduleTomorrowPage(),
-        SettingsPage.routeName: (_) => const SettingsPage(),
-        ReportsPage.routeName: (_) => const ReportsPage(),
+        '/':                (ctx) => const LoginPage(),
+        '/home':            (ctx) => const HomePage(),
+        '/upload-invoice':  (ctx) => const UploadInvoicePage(),
+        '/equipment-check': (ctx) => const EquipmentCheckPage(),
+        '/tools-reports':   (ctx) => const ToolsReportsPage(),
+        '/schedule-tomorrow': (ctx) => const ScheduleTomorrowPage(),
+        '/settings':        (ctx) => const SettingsPage(),
+        '/reports':         (ctx) => const ReportsPage(),
       },
     );
   }
