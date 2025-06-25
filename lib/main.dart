@@ -1,19 +1,11 @@
+// lib/main.dart
+
 import 'package:flutter/material.dart';
 import 'pages/login_page.dart';
 import 'pages/home_page.dart';
 import 'pages/upload_invoice_page.dart';
 import 'pages/project_invoice_page.dart';
-import 'pages/equipment_setup_page.dart';
-import 'pages/equipment_check_page.dart';
-import 'pages/tools_reports_page.dart';
-import 'pages/schedule_tomorrow_page.dart';
-import 'pages/maintenance_requests_review_page.dart';
-import 'pages/request_page.dart';
-import 'pages/money_requests_review_page.dart';
-import 'pages/user_management_page.dart';
-import 'pages/export_reports_page.dart';
-import 'pages/attendance_page.dart';
-import 'pages/settings_page.dart';
+// باقي الصفحات ستُضاف لاحقًا عندما تكون جاهزة
 
 void main() => runApp(const MyApp());
 
@@ -24,23 +16,24 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Tanourine App',
       debugShowCheckedModeBanner: false,
-      initialRoute: LoginPage.route,
+      initialRoute: '/',
       routes: {
-        LoginPage.route: (_) => const LoginPage(),
-        HomePage.route: (_) => const HomePage(),
-        UploadInvoicePage.route: (_) => const UploadInvoicePage(),
-        ProjectInvoicePage.route: (_) => const ProjectInvoicePage(),
-        EquipmentSetupPage.route: (_) => const EquipmentSetupPage(),
-        EquipmentCheckPage.route: (_) => const EquipmentCheckPage(),
-        ToolsReportsPage.route: (_) => const ToolsReportsPage(),
-        ScheduleTomorrowPage.route: (_) => const ScheduleTomorrowPage(),
-        MaintenanceRequestsReviewPage.route: (_) => const MaintenanceRequestsReviewPage(),
-        RequestPage.route: (_) => const RequestPage(),
-        MoneyRequestsReviewPage.route: (_) => const MoneyRequestsReviewPage(),
-        UserManagementPage.route: (_) => const UserManagementPage(),
-        ExportReportsPage.route: (_) => const ExportReportsPage(),
-        AttendancePage.route: (_) => const AttendancePage(),
-        SettingsPage.route: (_) => const SettingsPage(),
+        '/':               (ctx) => const LoginPage(),
+        '/home':           (ctx) => const HomePage(),
+        '/upload-invoice': (ctx) => const UploadInvoicePage(),
+        '/project-invoice':(ctx) => const ProjectInvoicePage(),
+        // عندما تصبح باقي الصفحات جاهزة، أضف هنا:
+        // '/equipment-setup':       (_) => const EquipmentSetupPage(),
+        // '/equipment-check':       (_) => const EquipmentCheckPage(),
+        // '/tools-reports':         (_) => const ToolsReportsPage(),
+        // '/schedule-tomorrow':     (_) => const ScheduleTomorrowPage(),
+        // '/maintenance-requests':  (_) => const MaintenanceRequestsReviewPage(),
+        // '/requests':              (_) => const RequestPage(),
+        // '/money-requests-review': (_) => const MoneyRequestsReviewPage(),
+        // '/user-management':       (_) => const UserManagementPage(),
+        // '/export-reports':        (_) => const ExportReportsPage(),
+        // '/attendance':            (_) => const AttendancePage(),
+        // '/settings':              (_) => const SettingsPage(),
       },
     );
   }

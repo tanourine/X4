@@ -1,20 +1,11 @@
+// lib/widgets/drawer_menu.dart
+
 import 'package:flutter/material.dart';
 import '../pages/login_page.dart';
 import '../pages/home_page.dart';
 import '../pages/upload_invoice_page.dart';
 import '../pages/project_invoice_page.dart';
-import '../pages/equipment_setup_page.dart';
-import '../pages/equipment_check_page.dart';
-import '../pages/tools_reports_page.dart';
-import '../pages/schedule_tomorrow_page.dart';
-import '../pages/maintenance_requests_review_page.dart';
-import '../pages/request_page.dart';
-import '../pages/money_requests_review_page.dart';
-import '../pages/user_management_page.dart';
-import '../pages/export_reports_page.dart';
-import '../pages/attendance_page.dart';
-import '../pages/settings_page.dart';
-import '../pages/login_page.dart';
+// لا تستورد هنا الصفحات غير الموجودة بعد
 
 class DrawerMenu extends StatelessWidget {
   final String username;
@@ -25,57 +16,40 @@ class DrawerMenu extends StatelessWidget {
   Widget build(BuildContext ctx) {
     final items = <_MenuItem>[];
 
-    // Admin
     if (role == UserRole.admin) {
       items.addAll([
-        _MenuItem('الرئيسية', Icons.home, HomePage.route),
-        _MenuItem('تحميل فواتير المشاريع', Icons.receipt, ProjectInvoicePage.route),
-        _MenuItem('تقارير العدة والأدوات', Icons.report, ToolsReportsPage.route),
-        _MenuItem('إدارة المستخدمين', Icons.people, UserManagementPage.route),
-        _MenuItem('مراجعة طلبات الأموال', Icons.money, MoneyRequestsReviewPage.route),
-        _MenuItem('توليد ملفات', Icons.file_download, ExportReportsPage.route),
-        _MenuItem('العدة والأدوات', Icons.build, EquipmentSetupPage.route),
-        _MenuItem('تحديد موعد الدوام غداً', Icons.calendar_today, ScheduleTomorrowPage.route),
-        _MenuItem('مراجعة طلبات الصيانة', Icons.build_circle, MaintenanceRequestsReviewPage.route),
-        _MenuItem('الإعدادات', Icons.settings, SettingsPage.route),
+        _MenuItem('الرئيسية', Icons.home, '/home'),
+        _MenuItem('تحميل فواتير المشاريع', Icons.receipt, '/project-invoice'),
+        // أضف هنا باقي البنود عند تجهيز الصفحات
+        _MenuItem('الإعدادات', Icons.settings, '/settings'),
       ]);
     }
 
-    // Supervisor
     if (role == UserRole.maintenanceManager) {
       items.addAll([
-        _MenuItem('الرئيسية', Icons.home, HomePage.route),
-        _MenuItem('تحميل فواتير', Icons.attach_money, UploadInvoicePage.route),
-        _MenuItem('تقارير العدة والأدوات', Icons.report, ToolsReportsPage.route),
-        _MenuItem('العدة والأدوات', Icons.build, EquipmentSetupPage.route),
-        _MenuItem('تحديد موعد الدوام غداً', Icons.calendar_today, ScheduleTomorrowPage.route),
-        _MenuItem('مراجعة طلبات الصيانة', Icons.build_circle, MaintenanceRequestsReviewPage.route),
-        _MenuItem('الإعدادات', Icons.settings, SettingsPage.route),
+        _MenuItem('الرئيسية', Icons.home, '/home'),
+        _MenuItem('تحميل فواتير', Icons.attach_money, '/upload-invoice'),
+        _MenuItem('الإعدادات', Icons.settings, '/settings'),
       ]);
     }
 
-    // Technician
     if (role == UserRole.technician) {
       items.addAll([
-        _MenuItem('الرئيسية', Icons.home, HomePage.route),
-        _MenuItem('تحميل فواتير', Icons.attach_money, UploadInvoicePage.route),
-        _MenuItem('طلبات الصيانة', Icons.build_circle, MaintenanceRequestsReviewPage.route),
-        _MenuItem('تشييك العدة', Icons.handyman, EquipmentCheckPage.route),
-        _MenuItem('الإعدادات', Icons.settings, SettingsPage.route),
+        _MenuItem('الرئيسية', Icons.home, '/home'),
+        _MenuItem('تحميل فواتير', Icons.attach_money, '/upload-invoice'),
+        _MenuItem('الإعدادات', Icons.settings, '/settings'),
       ]);
     }
 
-    // Assistant
     if (role == UserRole.assistant) {
       items.addAll([
-        _MenuItem('الرئيسية', Icons.home, HomePage.route),
-        _MenuItem('تحميل فواتير', Icons.attach_money, UploadInvoicePage.route),
-        _MenuItem('الإعدادات', Icons.settings, SettingsPage.route),
+        _MenuItem('الرئيسية', Icons.home, '/home'),
+        _MenuItem('تحميل فواتير', Icons.attach_money, '/upload-invoice'),
+        _MenuItem('الإعدادات', Icons.settings, '/settings'),
       ]);
     }
 
-    // Common Logout
-    items.add(_MenuItem('تسجيل الخروج', Icons.logout, LoginPage.route));
+    items.add(_MenuItem('تسجيل الخروج', Icons.logout, '/'));
 
     return Drawer(
       child: SafeArea(
@@ -86,7 +60,7 @@ class DrawerMenu extends StatelessWidget {
               title: Text(it.title),
               onTap: () {
                 Navigator.pop(ctx);
-                if (it.route == LoginPage.route) {
+                if (it.route == '/') {
                   Navigator.pushReplacementNamed(ctx, it.route);
                 } else {
                   Navigator.pushNamed(ctx, it.route);
